@@ -1,7 +1,6 @@
 package fr.maxlego08.menu.loader;
 
 import com.cryptomorin.xseries.XSound;
-import com.google.common.base.Charsets;
 import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.MenuPlugin;
 import fr.maxlego08.menu.api.ButtonManager;
@@ -19,7 +18,6 @@ import fr.maxlego08.menu.api.requirement.Requirement;
 import fr.maxlego08.menu.api.requirement.data.ActionPlayerData;
 import fr.maxlego08.menu.api.requirement.permissible.PlaceholderPermissible;
 import fr.maxlego08.menu.api.utils.OpenLink;
-import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.api.utils.TypedMapAccessor;
 import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.button.ZPermissibleButton;
@@ -38,9 +36,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
+import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ZButtonLoader extends ZUtils implements Loader<Button> {
@@ -76,64 +79,16 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
 
             String fileName = configuration.getString(path + "pattern.fileName", configuration.getString(path + "pattern.file-name"));
             String pluginName = configuration.getString(path + "pattern.pluginName", configuration.getString(path + "pattern.plugin-name", null));
-            Plugin plugin = pluginName != null ? Bukkit.getPluginManager().getPlugin(pluginName) : this.plugin;
-            if (plugin == null) throw new InventoryButtonException("Impossible to load the pattern " + fileName);
+            Plugin patternPlugin = pluginName != null ? Bukkit.getPluginManager().getPlugin(pluginName) : this.plugin;
+            if (patternPlugin == null) throw new InventoryButtonException("Impossible to load the pattern " + fileName);
 
-            File patternFile = new File(plugin.getDataFolder(), "patterns/" + fileName + ".yml");
+            File patternFile = new File(patternPlugin.getDataFolder(), "patterns/" + fileName + ".yml");
             if (!patternFile.exists()) {
                 throw new InventoryButtonException("Impossible to load the pattern " + fileName + ", file doesnt exist");
             }
 
-            YamlConfiguration patternConfiguration = new YamlConfiguration();
-
-            try {
-                FileInputStream stream = new FileInputStream(patternFile);
-                Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
-
-                BufferedReader input = new BufferedReader(reader);
-                StringBuilder builder = new StringBuilder();
-                Placeholders placeholders = new Placeholders();
-
-                String line;
-                try {
-                    while ((line = input.readLine()) != null) {
-
-                        for (Map.Entry<String, Object> replacement : mapPlaceholders.entrySet()) {
-                            String key = replacement.getKey();
-                            Object value = replacement.getValue();
-
-                            if (line != null) {
-                                if (value instanceof List<?> && line.contains("%" + key + "%")) {
-                                    int index = line.indexOf("%" + key + "%");
-                                    String prefix = line.substring(0, index);
-                                    String finalLine = line.substring(index);
-                                    ((List<?>) value).forEach(currentValue -> {
-                                        String currentElement = placeholders.parse(finalLine, key, currentValue.toString());
-                                        builder.append(placeholders.parse(prefix, key, currentValue.toString())).append(currentElement);
-                                        builder.append('\n');
-                                    });
-
-                                    line = null;
-                                } else {
-                                    line = placeholders.parse(line, key, value.toString());
-                                }
-                            }
-                        }
-
-                        if (line != null) {
-                            builder.append(line);
-                            builder.append('\n');
-                        }
-                    }
-                } finally {
-                    input.close();
-                }
-
-                patternConfiguration.loadFromString(builder.toString());
-
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
+            mapPlaceholders.putAll(this.plugin.getGlobalPlaceholders());
+            YamlConfiguration patternConfiguration = loadAndReplaceConfiguration(patternFile, mapPlaceholders);
             return this.load(patternConfiguration, "button.", buttonName);
         }
 
@@ -188,8 +143,8 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
                 slots = new ArrayList<>();
             }
         }
-      
-        if(slots.isEmpty()) {
+
+        if (slots.isEmpty()) {
             button.setSlot(slot);
         } else {
             button.setSlots(slots);
@@ -211,7 +166,7 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
                 itemStack.setMaterial("PLAYER_HEAD");
             } else {
                 itemStack.setMaterial("SKULL_ITEM");
-                itemStack.setData(3);
+                itemStack.setData("3");
             }
             button.setPlayerHead(playerHead);
         }
@@ -330,16 +285,24 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
         if (rightCommands.isEmpty()) rightCommands = configuration.getStringList(path + "right-player-commands");
 
         List<String> consoleCommands = configuration.getStringList(path + "consoleCommands");
-        if (consoleCommands.isEmpty()) consoleCommands = configuration.getStringList(path + "console-commands");
+        if (consoleCommands.isEmpty()) {
+            consoleCommands = configuration.getStringList(path + "console-commands");
+        }
+
         List<String> consoleRightCommands = configuration.getStringList(path + "consoleRightCommands");
-        if (consoleRightCommands.isEmpty())
+        if (consoleRightCommands.isEmpty()) {
             consoleRightCommands = configuration.getStringList(path + "console-right-commands");
+        }
+
         List<String> consoleLeftCommands = configuration.getStringList(path + "consoleLeftCommands");
-        if (consoleLeftCommands.isEmpty())
+        if (consoleLeftCommands.isEmpty()) {
             consoleLeftCommands = configuration.getStringList(path + "console-left-commands");
+        }
+
         List<String> consolePermissionCommands = configuration.getStringList(path + "consolePermissionCommands");
-        if (consolePermissionCommands.isEmpty())
+        if (consolePermissionCommands.isEmpty()) {
             consolePermissionCommands = configuration.getStringList(path + "console-permission-commands");
+        }
         String consolePermission = configuration.getString(path + "consolePermission", configuration.getString(path + "console-permission"));
 
         button.setCommands(commands);
@@ -384,16 +347,7 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
      * @param path          current path in configuration
      */
     private void loadClickRequirements(ZButton button, YamlConfiguration configuration, String path, File file) throws InventoryException {
-        String[] sectionStrings = {
-                "click_requirement.",
-                "click-requirement.",
-                "click_requirements.",
-                "click-requirements.",
-                "clicks_requirement.",
-                "clicks-requirement.",
-                "clicks_requirements.",
-                "clicks-requirements."
-        };
+        String[] sectionStrings = {"click_requirement.", "click-requirement.", "click_requirements.", "click-requirements.", "clicks_requirement.", "clicks-requirement.", "clicks_requirements.", "clicks-requirements."};
         ConfigurationSection section = null;
         String sectionString = "";
         for (int i = 0; i < sectionStrings.length; i++) {
