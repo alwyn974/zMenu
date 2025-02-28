@@ -6,20 +6,20 @@ import java.util.List;
 
 public class CommandSchema {
     @Schema(description = "The command name")
-    private String command;
+    public String command;
 
     @Schema(description = "The permission required to use this command")
-    private String permission;
+    public String permission;
 
     @Schema(description = "The inventory associated with this command")
-    private String inventory;
+    public String inventory;
 
     @Schema(description = "The message displayed when permission is denied", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String denyMessage;
+    public String denyMessage;
 
     @Schema(description = "Aliases for the command")
-    private List<String> aliases;
+    public List<String> aliases;
 
     @Schema(description = "Command arguments")
-    private List<CommandArgument> arguments;
+    public List<CommandArgument> arguments;
 }
