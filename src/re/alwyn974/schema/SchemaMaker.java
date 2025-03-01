@@ -21,35 +21,12 @@ public class SchemaMaker {
         // https://github.com/victools/jsonschema-generator/tree/main/jsonschema-maven-plugin
         ObjectMapper objectMapper = new ObjectMapper();
         Swagger2Module module = new Swagger2Module();
-        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(objectMapper, SchemaVersion.DRAFT_7, OptionPreset.PLAIN_JSON)
+        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(objectMapper, SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
                 .with(module)
                 .with(Option.MAP_VALUES_AS_ADDITIONAL_PROPERTIES,
                         Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT,
                         Option.STRICT_TYPE_INFO);
-        CustomPropertyDefinitionProvider xSoundProvider = (member, context) -> Optional
-                .ofNullable(member.getAnnotationConsideringFieldAndGetter(XSoundSchema.class))
-                .map(annotation -> {
-                    ObjectNode node = context.getGeneratorConfig().createObjectNode();
-                    node.put("type", "string");
-                    ArrayNode enumNode = node.putArray("enum");
-                    for (XSound value : XSound.getValues())
-                        enumNode.add(value.name());
-                    return new CustomPropertyDefinition(node);
-                }).orElse(null);
-        configBuilder.forFields().withCustomDefinitionProvider(xSoundProvider);
 
-//        configBuilder.forTypesInGeneral().withCustomDefinitionProvider((javaType, context) -> {
-//            System.out.println(javaType.getErasedType());
-//            XSoundSchema annotation = javaType.getErasedType().getAnnotation(XSoundSchema.class);
-//            System.out.println(annotation);
-//            if (annotation == null) return null;
-//            ObjectNode node = context.getGeneratorConfig().createObjectNode();
-//            node.put("type", "string");
-//            ArrayNode enumNode = node.putArray("enum");
-//            for (XSound value : XSound.getValues())
-//                enumNode.add(value.name());
-//            return new CustomDefinition(node, true);
-//        });
         SchemaGeneratorConfig config = configBuilder.build();
         SchemaGenerator generator = new SchemaGenerator(config);
         JsonNode jsonSchema = generator.generateSchema(CommandsSchema.class);
