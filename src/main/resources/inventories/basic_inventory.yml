@@ -20,6 +20,8 @@
 #
 ####################################################
 
+# $schema: ../../../../inventory.json
+
 # Size (https://docs.zmenu.dev/configurations/inventories#size)
 #
 # Allows to set the size of the inventory.
