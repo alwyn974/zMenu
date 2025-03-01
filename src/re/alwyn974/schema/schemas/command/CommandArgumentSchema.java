@@ -6,7 +6,7 @@ import re.alwyn974.schema.schemas.actions.*;
 
 import java.util.List;
 
-public class CommandArgument {
+public class CommandArgumentSchema {
     @Schema(description = "The argument name", requiredMode = Schema.RequiredMode.REQUIRED)
     public String name;
 

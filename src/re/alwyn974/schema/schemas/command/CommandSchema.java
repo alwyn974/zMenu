@@ -21,5 +21,5 @@ public class CommandSchema {
     public List<String> aliases;
 
     @Schema(description = "Command arguments")
-    public List<CommandArgument> arguments;
+    public List<CommandArgumentSchema> arguments;
 }
