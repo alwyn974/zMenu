@@ -1,14 +1,14 @@
 package re.alwyn974.schema.schemas.inventory;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.bukkit.event.inventory.InventoryType;
-import re.alwyn974.schema.schemas.button.ButtonSchema;
+import re.alwyn974.schema.schemas.inventory.button.ButtonSchema;
 
 import java.util.List;
 import java.util.Map;
 
 public class InventorySchema {
+    @re.alwyn974.schema.annotations.Schema()
     @Schema(description = "The name of the inventory")
     public String name;
     @Schema(description = "The name of the inventory")
