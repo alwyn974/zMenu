@@ -56,7 +56,7 @@ public class ZPlayerData implements PlayerData {
     }
 
     private void clearExpiredData() {
-        this.getDatas().stream().filter(Data::isExpired).forEach(this::removeData);
+        this.datas.values().removeIf(Data::isExpired);
     }
 
 }
