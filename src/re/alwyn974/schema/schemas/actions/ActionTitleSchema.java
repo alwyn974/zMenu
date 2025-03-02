@@ -16,12 +16,12 @@ public class ActionTitleSchema extends ActionBaseSchema {
     @Schema(description = "The subtitle to display", requiredMode = Schema.RequiredMode.REQUIRED)
     public String subtitle;
 
-    @Schema(description = "The fade-in time in milliseconds", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
-    public int fadeIn = 10;
+    @Schema(description = "The start (fade-in) time in milliseconds with minimessage enabled, in ticks without", example = "10", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "0")
+    public int start;
 
-    @Schema(description = "The stay time in milliseconds", example = "70", requiredMode = Schema.RequiredMode.REQUIRED)
-    public int stay = 70;
+    @Schema(description = "The duration time in milliseconds with minimessage enabled, in ticks without", example = "70", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "0")
+    public int duration;
 
-    @Schema(description = "The fade-out time in milliseconds", example = "20", requiredMode = Schema.RequiredMode.REQUIRED)
-    public int fadeOut = 20;
+    @Schema(description = "The end (fade-out) time in milliseconds with minimessage enabled, in ticks without", example = "20", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "0")
+    public int end;
 }
