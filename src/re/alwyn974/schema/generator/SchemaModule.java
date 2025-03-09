@@ -8,8 +8,7 @@ import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.generator.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import re.alwyn974.schema.annotations.ArraySchema;
-import re.alwyn974.schema.annotations.Schema;
+import re.alwyn974.schema.annotations.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -54,13 +53,26 @@ public class SchemaModule implements Module {
                 return;
             if (scope.getType().isArray() || scope.getType().isInstanceOf(Map.class))
                 return;
-            ResolvedType type = scope.getType();
-            type.getMemberFields().stream().filter(field -> field.getRawMember().isAnnotationPresent(Schema.class)).forEach(field -> {
+            ResolvedType resolvedType = scope.getType();
+            resolvedType.getMemberFields().stream().filter(field -> field.getRawMember().isAnnotationPresent(Schema.class)).forEach(field -> {
                 Schema schema = field.getRawMember().getAnnotation(Schema.class);
-                if (schema.names().length == 0) return;
                 String fieldName = schema.name().isEmpty() ? field.getRawMember().getName() : schema.name();
                 JsonNode properties = node.get("properties");
                 JsonNode propertyValue = properties.findValue(fieldName);
+
+                if (!schema.type().isEmpty() || schema.types().length > 0) {
+                    ObjectNode parent = (ObjectNode) propertyValue.findParent("type");
+                    if (schema.types().length > 0) {
+                        parent.remove("type");
+                        ArrayNode types = parent.putArray("type");
+                        for (String type : schema.types())
+                            types.add(type);
+                    } else if (!schema.type().isEmpty()) {
+                        node.put("type", schema.type());
+                    }
+                }
+
+                if (schema.names().length == 0) return;
                 for (String name : schema.names()) {
                     ObjectNode newObjectNode = properties.withObject(name);
                     newObjectNode.setAll((ObjectNode) propertyValue);
@@ -135,6 +147,7 @@ public class SchemaModule implements Module {
 
         // take care of various keywords that are not so straightforward to apply
         configPart.withInstanceAttributeOverride(this::overrideInstanceAttributes);
+//        configPart.withDependentRequiresResolver();
     }
 
     /**
@@ -548,15 +561,6 @@ public class SchemaModule implements Module {
         properties.put("$vocabulary", Schema::$vocabulary);
 
         properties.forEach((name, value) -> addProperty(memberAttributes, name, () -> value.apply(annotation)));
-
-        if (annotation.types().length > 0) {
-            memberAttributes.remove("type");
-            ArrayNode types = memberAttributes.putArray("type");
-            for (String type : annotation.types())
-                types.add(type);
-        } else if (!annotation.type().isEmpty()) {
-            memberAttributes.put("type", annotation.type());
-        }
 
         if (annotation.examples().length > 0) {
             ArrayNode examples = memberAttributes.putArray("examples");

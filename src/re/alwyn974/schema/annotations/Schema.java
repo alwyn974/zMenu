@@ -245,4 +245,12 @@ public @interface Schema {
      * Remove value when using allowedValues or enum
      */
     String[] excludeValues() default {};
+
+    /**
+     * Allows to specify the dependentRequired value
+     **
+     * @return an array of DependentRequire annotations
+     *
+     */
+    DependentRequired[] dependentRequiredMap() default {};
 }

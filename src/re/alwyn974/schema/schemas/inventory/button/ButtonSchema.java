@@ -1,6 +1,7 @@
 package re.alwyn974.schema.schemas.inventory.button;
 
 import re.alwyn974.schema.annotations.ArraySchema;
+import re.alwyn974.schema.annotations.DependentRequired;
 import re.alwyn974.schema.annotations.Schema;
 import re.alwyn974.schema.schemas.inventory.PlaceholderSchema;
 import re.alwyn974.schema.schemas.inventory.SoundSchema;
@@ -18,9 +19,9 @@ public class ButtonSchema {
     public String type = "NONE";
 
     @Schema(description = "The slot where your item is. It should be a number between 0 and inventory (limit - 1). You can specify the page using <page>-<slot> syntax.",
-            pattern = "^[0-9]*$|^[0-9]*-[0-9]*$", examples = {"0", "0-8", "2-5"}
+            pattern = "^[0-9]*$|^[0-9]*-[0-9]*$", examples = {"0", "0-8", "2-5"}, types = {"string", "integer"}
     )
-    public int slot = 0;
+    public String slot = "0";
 
     @ArraySchema(schema = @Schema(description = "The slots, you can either write the slot number or use <start>-<end> syntax", examples = {"1", "1-6"}), minItems = 1)
     public List<String> slots;
@@ -46,7 +47,7 @@ public class ButtonSchema {
     @Schema(description = "The pattern to use. Every placeholder used in pattern need to be added below as key"/*, additionalItems = String.class*/)
     public ButtonPatternSchema pattern;
 
-    @Schema(description = "Send a link to the player. Only use this if you can't use MiniMessage! https://docs.zmenu.dev/configurations/buttons#openlink", requiredProperties = {"messages"})
+    @Schema(description = "Send a link to the player. Only use this if you can't use MiniMessage! https://docs.zmenu.dev/configurations/buttons#openlink", dependentRequiredMap = @DependentRequired("messages"))
     public String link;
     @Schema(description = "The message shown instead of the %link% placeholder", requiredProperties = {"replace", "hover", "message", "link"})
     public String message;

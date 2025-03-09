@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Subtype resolver considering {@code @Schema(subTypes = ...)} and as fall-back {@code @Schema(anyOf = ...)}.
+ * Subtype resolver considering {@code @Schema(anyOf = ...)}.
  */
 public class SubtypeResolver implements com.github.victools.jsonschema.generator.SubtypeResolver {
 
