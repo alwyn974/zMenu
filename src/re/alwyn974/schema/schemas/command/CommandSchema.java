@@ -1,6 +1,6 @@
 package re.alwyn974.schema.schemas.command;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.Schema;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class CommandSchema {
     @Schema(description = "The inventory associated with this command")
     public String inventory;
 
-    @Schema(description = "The message displayed when permission is denied", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "The message displayed when permission is denied", required = true)
     public String denyMessage;
 
     @Schema(description = "Aliases for the command")

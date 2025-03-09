@@ -1,6 +1,6 @@
 package re.alwyn974.schema.schemas.command;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.Schema;
 
 import java.util.Map;
 

@@ -1,7 +1,7 @@
 package re.alwyn974.schema.schemas.inventory.item;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.ArraySchema;
+import re.alwyn974.schema.annotations.Schema;
 import re.alwyn974.schema.schemas.actions.*;
 import re.alwyn974.schema.schemas.inventory.RequirementSchema;
 
@@ -9,11 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemSchema {
-    @Schema(description = "The material of the item", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The material of the item", required = true)
     public String material;
-
-    @Schema(description = "The slot of the item", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    public int slot;
 
     @Schema(description = "The display name of the item")
     public String name;
@@ -21,10 +18,10 @@ public class ItemSchema {
     @Schema(description = "The lore of the item")
     public List<String> lore;
 
-    @Schema(description = "The amount of the item", example = "1")
+    @Schema(description = "The amount of the item", examples = "1")
     public int amount;
 
-    @Schema(description = "The data value of the item", example = "0")
+    @Schema(description = "The data value of the item", examples = "0")
     public short data;
 
     @Schema(description = "The custom model data of the item")
@@ -36,7 +33,7 @@ public class ItemSchema {
     @Schema(description = "The item flags")
     public List<String> flags;
 
-    @Schema(description = "Whether the item should glow", example = "false")
+    @Schema(description = "Whether the item should glow", examples = "false")
     public boolean glow;
 
     @Schema(description = "The button type")

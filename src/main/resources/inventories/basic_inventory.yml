@@ -21,6 +21,7 @@
 ####################################################
 
 # $schema: ../../../../inventory.json
+# yaml-language-server: $schema=../../../../inventory.json
 
 # Size (https://docs.zmenu.dev/configurations/inventories#size)
 #
@@ -69,6 +70,7 @@ items:
     slot: 4
     # You will now specify the content of your item. The item will include all configuration items that will be displayed in the inventory, name, lore etc.
     # https://docs.zmenu.dev/configurations/items
+    useCache: false
     item:
       # Let’s start with a block of grass
       # To find the list of materials you must go to the spigot documentation: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html

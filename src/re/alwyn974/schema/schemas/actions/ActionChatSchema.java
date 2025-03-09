@@ -1,6 +1,6 @@
 package re.alwyn974.schema.schemas.actions;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.Schema;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import java.util.List;
  * @see fr.maxlego08.menu.loader.actions.ChatLoader
  */
 public class ActionChatSchema extends ActionBaseSchema {
-    @Schema(description = "The type of the action", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"chat"})
+    @Schema(description = "The type of the action", required = true, allowedValues = {"chat"})
     public String type;
 
-    @Schema(description = "The messages to send in chat", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The messages to send in chat", required = true)
     public List<String> messages;
 }

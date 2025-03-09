@@ -1,7 +1,5 @@
 package re.alwyn974.schema.annotations;
 
-import io.swagger.v3.oas.annotations.OpenAPI31;
-
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -73,13 +71,8 @@ public @interface Schema {
     String name() default "";
 
     /**
-     * Use the variable name as the property name
-     */
-    boolean useVariableName() default true;
-
-    /**
      * If the property has multiple names. This will be used as "oneOf"
-     * It will be appended to the variable if useVariableName is true
+     * It will also take the variable name as a name. If you want to override it, use the name attribute
      */
     String[] names() default {};
 
@@ -247,4 +240,9 @@ public @interface Schema {
      * Don't add the property to the schema
      */
     boolean hidden() default false;
+
+    /**
+     * Remove value when using allowedValues or enum
+     */
+    String[] excludeValues() default {};
 }

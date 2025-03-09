@@ -97,7 +97,6 @@
                                     <exclude>com.fasterxml.*:*</exclude>
                                     <exclude>com.fasterxml:*</exclude>
                                     <exclude>org.slf4j:*</exclude>
-                                    <exclude>io.swagger.core.v3:*</exclude>
                                 </excludes>
                             </artifactSet>
                             <relocations>
@@ -120,34 +119,6 @@
                             </relocations>
                         </configuration>
                     </execution>
-                    <!--<execution>
-                        <id>zMenu-Schemas</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>zMenu</finalName>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>*:*</exclude>
-                                </excludes>
-                                <includes>
-                                    <include>com.github.victools:*</include>
-                                    <include>com.fasterxml.*:*</include>
-                                    <include>com.fasterxml:*</include>
-                                    <include>org.slf4j:*</include>
-                                    <include>io.swagger.core.v3:*</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>*:*</pattern>
-                                    <shadedPattern>libs</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>-->
                 </executions>
             </plugin>
         </plugins>
@@ -372,16 +343,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-swagger-2</artifactId>
-            <version>4.37.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>2.2.28</version>
         </dependency>
     </dependencies>
 </project>

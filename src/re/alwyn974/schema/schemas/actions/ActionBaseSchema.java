@@ -1,8 +1,8 @@
 package re.alwyn974.schema.schemas.actions;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.Schema;
 
 public class ActionBaseSchema {
-    @Schema(description = "The delay before executing the action (in ticks)", example = "0")
+    @Schema(description = "The delay before executing the action (in ticks)", examples = "0")
     public int delay = 0;
 }

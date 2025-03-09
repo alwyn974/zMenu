@@ -1,23 +1,23 @@
 package re.alwyn974.schema.schemas.command;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
+import re.alwyn974.schema.annotations.ArraySchema;
+import re.alwyn974.schema.annotations.Schema;
 import re.alwyn974.schema.schemas.actions.*;
 
 import java.util.List;
 
 public class CommandArgumentSchema {
-    @Schema(description = "The argument name", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The argument name", required = true)
     public String name;
 
     @Schema(description = "The inventory associated with this argument")
     public String inventory;
 
-    @Schema(description = "Whether this argument is required", defaultValue = "true")
-    public boolean isRequired;
+    @Schema(description = "Whether this argument is required")
+    public boolean isRequired = true;
 
-    @Schema(description = "Whether to perform the main action", defaultValue = "true")
-    public boolean performMainAction;
+    @Schema(description = "Whether to perform the main action")
+    public boolean performMainAction = true;
 
     @ArraySchema(schema = @Schema(oneOf = {
             ActionBarSchema.class, ActionBackSchema.class, ActionBookSchema.class, ActionBroadcastSchema.class, ActionBroadcastSoundSchema.class, ActionChatSchema.class,
