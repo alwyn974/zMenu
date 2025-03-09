@@ -1,7 +1,6 @@
 package re.alwyn974.schema.schemas.inventory.button;
 
 import re.alwyn974.schema.annotations.ArraySchema;
-import re.alwyn974.schema.annotations.DependentRequired;
 import re.alwyn974.schema.annotations.Schema;
 import re.alwyn974.schema.schemas.inventory.PlaceholderSchema;
 import re.alwyn974.schema.schemas.inventory.SoundSchema;
@@ -47,13 +46,13 @@ public class ButtonSchema {
     @Schema(description = "The pattern to use. Every placeholder used in pattern need to be added below as key"/*, additionalItems = String.class*/)
     public ButtonPatternSchema pattern;
 
-    @Schema(description = "Send a link to the player. Only use this if you can't use MiniMessage! https://docs.zmenu.dev/configurations/buttons#openlink", dependentRequiredMap = @DependentRequired("messages"))
+    @Schema(description = "Send a link to the player. Only use this if you can't use MiniMessage! https://docs.zmenu.dev/configurations/buttons#openlink", dependentRequired = "messages")
     public String link;
-    @Schema(description = "The message shown instead of the %link% placeholder", requiredProperties = {"replace", "hover", "message", "link"})
+    @Schema(description = "The message shown instead of the %link% placeholder", dependentRequired = {"replace", "hover", "message", "link"})
     public String message;
-    @Schema(description = "The placeholder to replace inside the messages", requiredProperties = {"replace", "hover", "message", "link"})
+    @Schema(description = "The placeholder to replace inside the messages", dependentRequired = {"replace", "hover", "message", "link"})
     public String replace;
-    @Schema(description = "The message to display when the player hovers over the link", requiredProperties = {"replace", "hover", "message", "link"})
+    @Schema(description = "The message to display when the player hovers over the link", dependentRequired = {"replace", "hover", "message", "link"})
     public List<String> hover;
 
     @Schema(description = "Close the inventory when clicked", names = {"close-inventory"})

@@ -252,5 +252,5 @@ public @interface Schema {
      * @return an array of DependentRequire annotations
      *
      */
-    DependentRequired[] dependentRequiredMap() default {};
+    String[] dependentRequired() default {};
 }

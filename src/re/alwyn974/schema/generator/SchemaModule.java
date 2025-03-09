@@ -147,7 +147,13 @@ public class SchemaModule implements Module {
 
         // take care of various keywords that are not so straightforward to apply
         configPart.withInstanceAttributeOverride(this::overrideInstanceAttributes);
-//        configPart.withDependentRequiresResolver();
+        configPart.withDependentRequiresResolver(this::resolveDependentRequires);
+    }
+
+    protected List<String> resolveDependentRequires(MemberScope<?, ?> member) {
+        return this.getSchemaAnnotationValue(member, Schema::dependentRequired, requires -> requires.length > 0)
+                .map(Arrays::asList)
+                .orElse(null);
     }
 
     /**
