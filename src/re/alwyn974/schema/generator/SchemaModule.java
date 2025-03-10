@@ -8,7 +8,8 @@ import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.generator.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import re.alwyn974.schema.annotations.*;
+import re.alwyn974.schema.annotations.ArraySchema;
+import re.alwyn974.schema.annotations.Schema;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -148,6 +149,13 @@ public class SchemaModule implements Module {
         // take care of various keywords that are not so straightforward to apply
         configPart.withInstanceAttributeOverride(this::overrideInstanceAttributes);
         configPart.withDependentRequiresResolver(this::resolveDependentRequires);
+        configPart.withAdditionalPropertiesResolver(this::resolveAdditionalProperties);
+    }
+
+    protected ResolvedType resolveAdditionalProperties(MemberScope<?, ?> member) {
+        return this.getSchemaAnnotationValue(member, Schema::additionalProperties, annotatedImplementation -> annotatedImplementation != Void.class)
+                .map(annotatedType -> member.getContext().resolve(annotatedType))
+                .orElse(null);
     }
 
     protected List<String> resolveDependentRequires(MemberScope<?, ?> member) {
@@ -240,18 +248,7 @@ public class SchemaModule implements Module {
             // prevent an invalid combination of "$ref" with "additionalProperties": false
             return Object.class;
         }
-//        switch (annotation.additionalProperties()) {
-//            case TRUE:
-//                // allow any additional properties
-//                return Object.class;
-//            case FALSE:
-//                // block any additional properties
-//                return Void.class;
-//            default:
-//                // fall-back on other configuration, e.g., as per Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT
-//                return null;
-//        }
-        return null;
+        return annotation.additionalProperties();
     }
 
     /**
@@ -476,7 +473,7 @@ public class SchemaModule implements Module {
     /**
      * Implementation of the {@code CustomPropertyDefinitionProvider} to consider external references given in {@code @Schema(ref = ...)}.
      *
-     * @param scope field/method to determine custom definition for
+     * @param scope   field/method to determine custom definition for
      * @param context generation context
      * @return custom definition containing the looked-up external reference or null
      */
@@ -512,8 +509,8 @@ public class SchemaModule implements Module {
      * </ul>
      *
      * @param memberAttributes already collected schema for the field/method
-     * @param member targeted field/method
-     * @param context generation context
+     * @param member           targeted field/method
+     * @param context          generation context
      */
     protected void overrideInstanceAttributes(ObjectNode memberAttributes, MemberScope<?, ?> member, SchemaGenerationContext context) {
         Schema annotation = this.getSchemaAnnotationValue(member, Function.identity(), x -> true).orElse(null);
@@ -587,11 +584,10 @@ public class SchemaModule implements Module {
      * Look up a value from a {@link Schema} annotation on the given property or its associated field/getter or an external class referenced by
      * {@link Schema#implementation()}.
      *
-     * @param member field/method for which to look-up any present {@link Schema} annotation
+     * @param member         field/method for which to look-up any present {@link Schema} annotation
      * @param valueExtractor the getter for the value from the annotation
-     * @param valueFilter filter that determines whether the value from a given annotation matches our criteria
-     * @param <T> the type of the returned value
-     *
+     * @param valueFilter    filter that determines whether the value from a given annotation matches our criteria
+     * @param <T>            the type of the returned value
      * @return the value from one of the matching {@link Schema} annotations or {@code Optional.empty()}
      */
     private <T> Optional<T> getSchemaAnnotationValue(MemberScope<?, ?> member, Function<Schema, T> valueExtractor, Predicate<T> valueFilter) {
@@ -617,8 +613,8 @@ public class SchemaModule implements Module {
      * Create a {@link ConfigFunction} that extracts a value from the {@link Schema} annotation of a {@link TypeScope}.
      *
      * @param valueExtractor the getter for the value from the annotation
-     * @param valueFilter filter that determines whether the value from a given annotation matches our criteria
-     * @param <T> the type of the returned value
+     * @param valueFilter    filter that determines whether the value from a given annotation matches our criteria
+     * @param <T>            the type of the returned value
      * @return the value from the matching type's {@link Schema} annotation or {@code Optional.empty()}
      */
     private <T> ConfigFunction<TypeScope, T> createTypePropertyResolver(Function<Schema, T> valueExtractor, Predicate<T> valueFilter) {

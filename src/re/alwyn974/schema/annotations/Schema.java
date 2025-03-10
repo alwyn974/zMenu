@@ -253,4 +253,9 @@ public @interface Schema {
      *
      */
     String[] dependentRequired() default {};
+
+    /**
+     * Allows specifying additional properties
+     */
+    Class<?> additionalProperties() default Void.class;
 }

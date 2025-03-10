@@ -43,7 +43,6 @@ public class ButtonSchema {
     @Schema(description = "Allows you to send a list of messages to the player upon clicking. You can use the MiniMessage format to send messages with click or hover actions.")
     public List<String> messages;
 
-    @Schema(description = "The pattern to use. Every placeholder used in pattern need to be added below as key"/*, additionalItems = String.class*/)
     public ButtonPatternSchema pattern;
 
     @Schema(description = "Send a link to the player. Only use this if you can't use MiniMessage! https://docs.zmenu.dev/configurations/buttons#openlink", dependentRequired = "messages")
@@ -77,6 +76,7 @@ public class ButtonSchema {
     @Schema(description = "Allows you to define a permission using a placeholder.", implementation = PlaceholderSchema.class)
     public Object placeholder;
 
+    @Schema(additionalProperties = Object.class, description = "The pattern to use. Every placeholder used in pattern need to be added below as key")
     public static class ButtonPatternSchema {
         @Schema(description = "The pattern file name", required = true, names = {"file-name"})
         public String fileName;
