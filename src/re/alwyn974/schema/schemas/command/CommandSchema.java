@@ -4,6 +4,10 @@ import re.alwyn974.schema.annotations.Schema;
 
 import java.util.List;
 
+/**
+ * JSON Schema for the command
+ * @see fr.maxlego08.menu.loader.CommandLoader
+ */
 public class CommandSchema {
     @Schema(description = "The command name")
     public String command;

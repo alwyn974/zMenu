@@ -12,7 +12,7 @@ public class InventorySchema {
     public String name;
     @Schema(description = "The size of the inventory. Can only be set if the type is CHEST. Size will be overriden if you use matrix !", required = true, allowedValues = {"9", "18", "27", "36", "45", "54"})
     public int size;
-    @Schema(description = "The type of the inventory. PLAYER & CRAFTING can't be used !")
+    @Schema(description = "The type of the inventory.", excludeValues = {"PLAYER", "CRAFTING"})
     public InventoryType type = InventoryType.CHEST;
     public Object fillItem;
     @Schema(description = "Specifies how often the buttons in the inventory should be refreshed, in milliseconds", names = {"update-interval"})

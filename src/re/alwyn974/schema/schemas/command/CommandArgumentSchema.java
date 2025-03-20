@@ -6,6 +6,10 @@ import re.alwyn974.schema.schemas.actions.*;
 
 import java.util.List;
 
+/**
+ * JSON Schema for the command argument
+ * @see fr.maxlego08.menu.loader.CommandLoader
+ */
 public class CommandArgumentSchema {
     @Schema(description = "The argument name", required = true)
     public String name;
@@ -29,4 +33,7 @@ public class CommandArgumentSchema {
 
     @Schema(description = "The list of auto-completions", name = "auto-completion")
     public List<String> autoCompletion;
+
+    @Schema(description = "The default value of the argument")
+    public String defaultValue;
 }
