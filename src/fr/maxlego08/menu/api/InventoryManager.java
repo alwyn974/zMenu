@@ -1,6 +1,7 @@
 package fr.maxlego08.menu.api;
 
 import fr.maxlego08.menu.api.button.ButtonOption;
+import fr.maxlego08.menu.api.checker.InventoryRequirementType;
 import fr.maxlego08.menu.api.enchantment.Enchantments;
 import fr.maxlego08.menu.api.event.FastEvent;
 import fr.maxlego08.menu.api.event.events.ButtonLoaderRegisterEvent;
@@ -493,5 +494,25 @@ public interface InventoryManager extends Savable, Listener {
      * @return The loaded YAML configuration.
      */
     YamlConfiguration loadYamlConfiguration(File file);
+
+    /**
+     * Loads an inventory element based on the specified requirement type and value.
+     * This method interprets the given type and value to configure or adjust
+     * inventory-related settings or behaviors.
+     *
+     * @param type  The type of inventory requirement to be loaded. This defines
+     *              the specific aspect of the inventory being targeted.
+     * @param value The value associated with the inventory requirement, used to
+     *              configure or modify the inventory setting as per the type specified.
+     */
+    void loadElement(InventoryRequirementType type, String value);
+
+    void registerInventoryOption(Plugin plugin, Class<? extends InventoryOption> inventoryOption);
+
+    Map<Plugin, List<Class<? extends InventoryOption>>> getInventoryOptions();
+
+    Optional<Class<? extends InventoryOption>> getInventoryOption(String name);
+
+    void unregisterInventoryOptions(Plugin plugin);
 
 }

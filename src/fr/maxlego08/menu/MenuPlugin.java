@@ -10,6 +10,7 @@ import fr.maxlego08.menu.api.pattern.PatternManager;
 import fr.maxlego08.menu.api.players.DataManager;
 import fr.maxlego08.menu.api.players.inventory.InventoriesPlayer;
 import fr.maxlego08.menu.api.scheduler.ZScheduler;
+import fr.maxlego08.menu.api.utils.CompatibilityUtil;
 import fr.maxlego08.menu.api.website.WebsiteManager;
 import fr.maxlego08.menu.command.VCommandManager;
 import fr.maxlego08.menu.command.commands.CommandMenu;
@@ -52,6 +53,8 @@ import fr.maxlego08.menu.zcore.utils.plugins.Plugins;
 import fr.maxlego08.menu.zcore.utils.plugins.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
 
@@ -77,7 +80,7 @@ import java.util.Optional;
 public class MenuPlugin extends ZPlugin {
 
     private static MenuPlugin instance;
-    private final ButtonManager buttonManager = new ZButtonManager();
+    private final ButtonManager buttonManager = new ZButtonManager(this);
     private final InventoryManager inventoryManager = new ZInventoryManager(this);
     private final CommandManager commandManager = new ZCommandManager(this);
     private final MessageLoader messageLoader = new MessageLoader(this);
@@ -180,33 +183,33 @@ public class MenuPlugin extends ZPlugin {
         this.addSave(this.dataManager);
 
         this.inventoryManager.registerMaterialLoader(new Base64Loader());
-        if (this.isEnable(Plugins.HEADDATABASE)) {
+        if (this.isActive(Plugins.HEADDATABASE)) {
             this.inventoryManager.registerMaterialLoader(new HeadDatabaseLoader());
         }
-        if (this.isEnable(Plugins.ZHEAD)) {
+        if (this.isActive(Plugins.ZHEAD)) {
             this.inventoryManager.registerMaterialLoader(new ZHeadLoader(this));
         }
-        if (this.isEnable(Plugins.ORAXEN)) {
+        if (this.isActive(Plugins.ORAXEN)) {
             this.inventoryManager.registerMaterialLoader(new OraxenLoader());
         }
-        if (this.isEnable(Plugins.NEXO)) {
+        if (this.isActive(Plugins.NEXO)) {
             this.inventoryManager.registerMaterialLoader(new NexoLoader());
         }
-        if (this.isEnable(Plugins.ITEMSADDER)) {
+        if (this.isActive(Plugins.ITEMSADDER)) {
             this.inventoryManager.registerMaterialLoader(new ItemsAdderLoader(this));
             this.fontImage = new ItemsAdderFont();
         }
-        if (this.isEnable(Plugins.SLIMEFUN)) {
+        if (this.isActive(Plugins.SLIMEFUN)) {
             this.inventoryManager.registerMaterialLoader(new SlimeFunLoader());
         }
-        if (this.isEnable(Plugins.NOVA)) {
+        if (this.isActive(Plugins.NOVA)) {
             this.inventoryManager.registerMaterialLoader(new NovaLoader());
         }
-        if (this.isEnable(Plugins.ECO)) {
+        if (this.isActive(Plugins.ECO)) {
             this.inventoryManager.registerMaterialLoader(new EcoLoader());
         }
 
-        if (this.isEnable(Plugins.ZITEMS)) {
+        if (this.isActive(Plugins.ZITEMS)) {
             this.inventoryManager.registerMaterialLoader(new ZItemsLoader(this));
         }
 
@@ -224,6 +227,18 @@ public class MenuPlugin extends ZPlugin {
         localPlaceholder.register("player_next_page", (player, s) -> String.valueOf(this.inventoryManager.getPage(player) + 1));
         localPlaceholder.register("player_previous_page", (player, s) -> String.valueOf(this.inventoryManager.getPage(player) - 1));
         localPlaceholder.register("player_max_page", (player, s) -> String.valueOf(this.inventoryManager.getMaxPage(player)));
+        localPlaceholder.register("player_previous_inventories", (playeofflinePlayer, s) -> {
+            if (playeofflinePlayer.isOnline()) {
+                Player player = playeofflinePlayer.getPlayer();
+                if (player == null) return "0";
+                InventoryHolder inventoryHolder = CompatibilityUtil.getTopInventory(player).getHolder();
+                if (inventoryHolder instanceof InventoryDefault) {
+                    InventoryDefault inventoryDefault = (InventoryDefault) inventoryHolder;
+                    return String.valueOf(inventoryDefault.getOldInventories().size());
+                }
+            }
+            return "0";
+        });
 
         ((ZDataManager) this.dataManager).registerPlaceholder(localPlaceholder);
 
