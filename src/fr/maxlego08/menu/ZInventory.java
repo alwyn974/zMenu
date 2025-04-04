@@ -86,7 +86,7 @@ public class ZInventory extends ZUtils implements Inventory {
                 return conditionalName.getName();
             }
         }
-        
+
         String locale = findPlayerLocale(player);
         return locale == null ? this.name : this.translatedNames.getOrDefault(locale, this.name);
     }
@@ -121,17 +121,6 @@ public class ZInventory extends ZUtils implements Inventory {
     }
 
     @Override
-    @Deprecated
-    public int getMaxPage(Player player, Object... objects) {
-        Optional<Integer> optional = this.buttons.stream().map(Button::getSlot).max(Integer::compare);
-        if (optional.isPresent()) {
-            int maxSlot = optional.get();
-            return (maxSlot / this.size) + 1;
-        }
-        return 1;
-    }
-
-    @Override
     public int getMaxPage(Collection<Pattern> patterns, Player player, Object... objects) {
 
         List<Button> buttons = new ArrayList<>(this.buttons);
@@ -153,7 +142,7 @@ public class ZInventory extends ZUtils implements Inventory {
         return this.buttons.stream().filter(button -> {
             int size = button.isPlayerInventory() ? 36 : this.size;
             int slot = button.getRealSlot(size, page);
-            return slot >= 0 && slot < size;
+            return (slot >= 0 && slot < size);
         }).collect(Collectors.toList());
     }
 

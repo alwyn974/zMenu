@@ -12,8 +12,6 @@ import fr.maxlego08.menu.api.itemstack.TrimConfiguration;
 import fr.maxlego08.menu.api.loader.MaterialLoader;
 import fr.maxlego08.menu.api.utils.MapConfiguration;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import fr.maxlego08.menu.api.utils.TrimHelper;
-import fr.maxlego08.menu.api.utils.TypedMapAccessor;
 import fr.maxlego08.menu.exceptions.ItemEnchantException;
 import fr.maxlego08.menu.save.Config;
 import fr.maxlego08.menu.zcore.logger.Logger;
@@ -23,12 +21,13 @@ import fr.maxlego08.menu.zcore.utils.LeatherArmor;
 import fr.maxlego08.menu.zcore.utils.Potion;
 import fr.maxlego08.menu.zcore.utils.ZUtils;
 import fr.maxlego08.menu.zcore.utils.attribute.AttributeApplier;
+import fr.maxlego08.menu.zcore.utils.itemstack.MenuItemStackFormMap;
+import fr.maxlego08.menu.zcore.utils.itemstack.MenuItemStackFromItemStack;
 import fr.maxlego08.menu.zcore.utils.meta.Meta;
 import fr.maxlego08.menu.zcore.utils.nms.NmsVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.banner.Pattern;
@@ -40,15 +39,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
-import org.bukkit.inventory.meta.trim.TrimMaterial;
-import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.potion.PotionType;
 
 import javax.annotation.Nullable;
@@ -89,6 +82,9 @@ public class MenuItemStack extends ZUtils {
     private boolean needPlaceholderAPI = false;
     private ItemStack cacheItemStack;
 
+    private boolean centerName;
+    private boolean centerLore;
+
     private int maxStackSize;
     private int maxDamage;
     private int damage;
@@ -112,212 +108,20 @@ public class MenuItemStack extends ZUtils {
     }
 
     public static MenuItemStack fromItemStack(InventoryManager manager, ItemStack itemStack) {
-
-        MenuItemStack menuItemStack = new MenuItemStack(manager, "", "");
-
-        menuItemStack.setMaterial(itemStack.getType().name());
-        int amount = itemStack.getAmount();
-        if (amount > 1) menuItemStack.setAmount(String.valueOf(itemStack.getAmount()));
-        if (NmsVersion.getCurrentVersion().isItemLegacy()) {
-            int durability = itemStack.getDurability();
-            if (durability > 0) menuItemStack.setDurability(durability);
-            int data = itemStack.getData().getData();
-            if (data > 0) menuItemStack.setData(String.valueOf(data));
-        }
-
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        if (itemMeta != null) {
-            if (itemMeta.hasDisplayName()) {
-                menuItemStack.setDisplayName(menuItemStack.colorReverse(itemMeta.getDisplayName()));
-            }
-
-            if (itemMeta.hasLore()) {
-                menuItemStack.setLore(menuItemStack.colorReverse(Objects.requireNonNull(itemMeta.getLore())));
-            }
-
-            menuItemStack.setFlags(new ArrayList<>(itemMeta.getItemFlags()));
-            menuItemStack.setEnchantments(itemMeta.getEnchants());
-
-            if (NmsVersion.getCurrentVersion().isCustomModelData() && itemMeta.hasCustomModelData()) {
-                menuItemStack.setModelID(itemMeta.getCustomModelData());
-            }
-
-            if (itemMeta instanceof SkullMeta) {
-                SkullMeta skullMeta = (SkullMeta) itemMeta;
-                // ToDo, upgrade ItemMeta
-            }
-
-            if (itemMeta instanceof EnchantmentStorageMeta) {
-                EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) itemMeta;
-                if (enchantmentStorageMeta.hasStoredEnchants()) {
-                    menuItemStack.setEnchantments(enchantmentStorageMeta.getEnchants());
-                }
-            }
-
-            try {
-                if (itemMeta instanceof PotionMeta) {
-                    PotionMeta potionMeta = (PotionMeta) itemMeta;
-                    PotionType type = potionMeta.getBasePotionType();
-                    if (type != null) {
-                        Potion menuPotion = new Potion(type, 0);
-                        menuItemStack.setPotion(menuPotion);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
-            try {
-                // ToDo, upgrade for multiple effect
-                if (itemMeta instanceof FireworkMeta) {
-                    FireworkMeta fireworkMeta = (FireworkMeta) itemMeta;
-                    List<FireworkEffect> fireworkEffects = fireworkMeta.getEffects();
-                    if (!fireworkEffects.isEmpty()) {
-                        FireworkEffect effect = fireworkEffects.get(0);
-                        Firework menuFirework = new Firework(false, effect);
-                        menuItemStack.setFirework(menuFirework);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
-            try {
-                // ToDo, upgrade for multiple effect
-                if (itemMeta instanceof FireworkEffectMeta) {
-                    FireworkEffectMeta fireworkMeta = (FireworkEffectMeta) itemMeta;
-                    FireworkEffect effect = fireworkMeta.getEffect();
-                    Firework menuFirework = new Firework(true, effect);
-                    menuItemStack.setFirework(menuFirework);
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        return menuItemStack;
+        return MenuItemStackFromItemStack.fromItemStack(manager, itemStack);
     }
 
+    /**
+     * Build a MenuItemStack from a map.
+     *
+     * @param inventoryManager the inventoryManager of the item
+     * @param file             the file where the item is saved
+     * @param path             the path of the item in the file
+     * @param map              the map which contains the item data
+     * @return the menuItemStack
+     */
     public static MenuItemStack fromMap(InventoryManager inventoryManager, File file, String path, Map<String, Object> map) {
-        TypedMapAccessor accessor = new TypedMapAccessor(map);
-        MenuItemStack menuItemStack = new MenuItemStack(inventoryManager, file.getPath(), path);
-
-        menuItemStack.setData(accessor.getString("data", "0"));
-        menuItemStack.setDurability(accessor.getInt("durability", 0));
-        menuItemStack.setAmount(accessor.getString("amount", "1"));
-        menuItemStack.setMaterial(accessor.getString("material", null));
-        menuItemStack.setTargetPlayer(accessor.getString("target", null));
-        menuItemStack.setUrl(accessor.getString("url", null));
-
-        List<String> lore = accessor.getStringList("lore");
-        if (lore.isEmpty()) {
-            Object object = accessor.getObject("lore", null);
-            if (object instanceof String) {
-                String loreString = (String) object;
-                lore = Arrays.asList(loreString.split("\n"));
-            }
-        }
-        menuItemStack.setLore(lore);
-        menuItemStack.setDisplayName(accessor.getString("name", accessor.getString("display_name", null)));
-        menuItemStack.setGlowing(accessor.getBoolean("glow"));
-        menuItemStack.setModelID(accessor.getString("modelID", accessor.getString("model-id", accessor.getString("modelId", accessor.getString("customModelId", accessor.getString("customModelData", accessor.getString("model_data", "0")))))));
-
-        Enchantments helperEnchantments = inventoryManager.getEnchantments();
-        List<String> enchants = accessor.getStringList("enchants");
-        Map<Enchantment, Integer> enchantments = new HashMap<>();
-
-        for (String enchantString : enchants) {
-
-            try {
-
-                String[] splitEnchant = enchantString.split(",");
-
-                if (splitEnchant.length == 1)
-                    throw new ItemEnchantException("an error occurred while loading the enchantment " + enchantString + " for file " + file.getAbsolutePath() + " with path " + path);
-
-                int level;
-                String enchant = splitEnchant[0];
-                try {
-                    level = Integer.parseInt(splitEnchant[1]);
-                } catch (NumberFormatException e) {
-                    throw new ItemEnchantException("an error occurred while loading the enchantment " + enchantString + " for file " + file.getAbsolutePath() + " with path " + path);
-                }
-
-                Optional<MenuEnchantment> optional = helperEnchantments.getEnchantments(enchant);
-                if (!optional.isPresent()) {
-                    throw new ItemEnchantException("an error occurred while loading the enchantment " + enchantString + " for file " + file.getAbsolutePath() + " with path " + path);
-                }
-
-                enchantments.put(optional.get().getEnchantment(), level);
-
-            } catch (ItemEnchantException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<ItemFlag> flags = accessor.getStringList("flags").stream().map(menuItemStack::getFlag).collect(Collectors.toList());
-
-        List<IAttribute> attributeModifiers = new ArrayList<>();
-
-        if (accessor.contains("attributes")) {
-            List<Map<String, Object>> attributesFromConfig = (List<Map<String, Object>>) accessor.getList("attributes");
-            if (attributesFromConfig != null) {
-                for (Map<String, Object> attributeMap : attributesFromConfig) {
-                    attributeModifiers.add(Attribute.deserialize(attributeMap));
-                }
-            }
-        }
-
-        menuItemStack.setEnchantments(enchantments);
-        menuItemStack.setFlags(flags);
-        menuItemStack.setAttributes(attributeModifiers);
-
-        if (NmsVersion.getCurrentVersion().isNewItemStackAPI()) {
-            loadNewItemStacks(menuItemStack, accessor, path, file);
-        }
-
-        return menuItemStack;
-    }
-
-    private static void loadNewItemStacks(MenuItemStack menuItemStack, TypedMapAccessor accessor, String path, File file) {
-        menuItemStack.setMaxStackSize(accessor.getInt("max-stack-size", 0));
-        menuItemStack.setMaxDamage(accessor.getInt("max-damage", 0));
-        menuItemStack.setDamage(accessor.getInt("damage", 0));
-        menuItemStack.setRepairCost(accessor.getInt("repair-cost", 0));
-        menuItemStack.setUnbreakableEnabled(getOrNull(accessor.getObject("unbreakable", null)));
-        menuItemStack.setUnbreakableShowInTooltip(getOrNull(accessor.getObject("unbreakable-show-in-tooltip", null)));
-        menuItemStack.setFireResistant(getOrNull(accessor.getObject("fire-resistant", null)));
-        menuItemStack.setHideTooltip(getOrNull(accessor.getObject("hide-tooltip", null)));
-        menuItemStack.setHideAdditionalTooltip(getOrNull(accessor.getObject("hide-additional-tooltip", null)));
-        menuItemStack.setEnchantmentGlint(getOrNull(accessor.getObject("enchantment-glint", null)));
-        menuItemStack.setEnchantmentShowInTooltip(getOrNull(accessor.getObject("enchantment-show-in-tooltip", null)));
-        menuItemStack.setAttributeShowInTooltip(getOrNull(accessor.getObject("attribute-show-in-tooltip", null)));
-
-        String rarityString = accessor.getString("item-rarity", null);
-        if (rarityString != null) {
-            menuItemStack.setItemRarity(MenuItemRarity.valueOf(rarityString.toUpperCase()));
-        }
-
-        boolean enableTrim = accessor.getBoolean("trim.enable", false);
-        if (enableTrim) {
-            TrimHelper trimHelper = new TrimHelper();
-            TrimPattern trimPattern = trimHelper.getTrimPatterns().get(accessor.getString("trim.pattern", "").toLowerCase());
-            if (trimPattern == null) {
-                enableTrim = false;
-                Bukkit.getLogger().severe("Trim pattern " + accessor.getString("trim.pattern", "") + " was not found for item " + file.getAbsolutePath());
-            }
-            TrimMaterial trimMaterial = trimHelper.getTrimMaterials().get(accessor.getString("trim.material", "").toLowerCase());
-            if (trimMaterial == null) {
-                enableTrim = false;
-                Bukkit.getLogger().severe("Trim material " + accessor.getString("trim.material", "") + " was not found for item " + file.getAbsolutePath());
-            }
-            menuItemStack.setTrimConfiguration(new TrimConfiguration(enableTrim, trimMaterial, trimPattern));
-        }
-    }
-
-    private static Boolean getOrNull(Object o) {
-        if (o instanceof Boolean) {
-            return (Boolean) o;
-        }
-        return null;
+        return MenuItemStackFormMap.fromMap(inventoryManager, file, path, map);
     }
 
     /**
@@ -436,22 +240,7 @@ public class MenuItemStack extends ZUtils {
         FontImage fontImage = this.inventoryManager.getFontImage();
 
         if (itemMeta != null) {
-            if (this.displayName != null) {
-                try {
-                    String displayName = locale == null ? this.displayName : this.translatedDisplayName.getOrDefault(locale, this.displayName);
-                    Meta.meta.updateDisplayName(itemMeta, fontImage.replace(placeholders.parse(displayName)), offlinePlayer == null ? player : offlinePlayer);
-                } catch (Exception exception) {
-                    Logger.info("Error with update display name for item " + path + " in file " + filePath + " (" + player + ", " + this.displayName + ")", Logger.LogType.ERROR);
-                    exception.printStackTrace();
-                }
-            }
-
-            if (!this.lore.isEmpty()) {
-                List<String> lore = papi(placeholders.parse(locale == null ? this.lore : this.translatedLore.getOrDefault(locale, this.lore)), player, useCache);
-                lore = lore.stream().flatMap(str -> Arrays.stream(str.split("\n"))).map(fontImage::replace).collect(Collectors.toList());
-
-                Meta.meta.updateLore(itemMeta, lore, offlinePlayer == null ? player : offlinePlayer);
-            }
+            this.applyDisplayNameLore(player, placeholders, itemMeta, offlinePlayer, locale, fontImage, useCache);
 
             Enchantments helperEnchantments = inventoryManager.getEnchantments();
             if (this.isGlowing) {
@@ -484,6 +273,10 @@ public class MenuItemStack extends ZUtils {
             if (NmsVersion.getCurrentVersion().isNewItemStackAPI()) {
                 this.buildNewItemStackAPI(itemStack, itemMeta, player, placeholders);
             }
+            if (NmsVersion.getCurrentVersion().isNewHeadApi()) {
+                this.buildTrimAPI(itemStack, itemMeta, player, placeholders);
+            }
+
 
             if (attributes.isEmpty() && NmsVersion.getCurrentVersion().getVersion() >= NmsVersion.V_1_20_4.getVersion()) {
                 itemMeta.setAttributeModifiers(ArrayListMultimap.create());
@@ -500,6 +293,35 @@ public class MenuItemStack extends ZUtils {
         if (!needPlaceholderAPI && Config.enableCacheItemStack) this.cacheItemStack = itemStack;
 
         return itemStack;
+    }
+
+    private void applyDisplayNameLore(Player player, Placeholders placeholders, ItemMeta itemMeta, OfflinePlayer offlinePlayer, String locale, FontImage fontImage, boolean useCache) {
+
+        String itemName = null;
+        List<String> itemLore = new ArrayList<>();
+
+        if (this.displayName != null) {
+            try {
+                String displayName = locale == null ? this.displayName : this.translatedDisplayName.getOrDefault(locale, this.displayName);
+                itemName = fontImage.replace(papi(placeholders.parse(displayName), player, useCache));
+            } catch (Exception exception) {
+                Logger.info("Error with update display name for item " + path + " in file " + filePath + " (" + player + ", " + this.displayName + ")", Logger.LogType.ERROR);
+                exception.printStackTrace();
+            }
+        }
+
+        if (!this.lore.isEmpty()) {
+            List<String> lore = papi(placeholders.parse(locale == null ? this.lore : this.translatedLore.getOrDefault(locale, this.lore)), player, useCache);
+            itemLore = lore.stream().flatMap(str -> Arrays.stream(str.split("\n"))).map(fontImage::replace).collect(Collectors.toList());
+        }
+
+        if (itemName != null) {
+            Meta.meta.updateDisplayName(itemMeta, itemName, offlinePlayer == null ? player : offlinePlayer);
+        }
+
+        if (!itemLore.isEmpty()) {
+            Meta.meta.updateLore(itemMeta, itemLore, offlinePlayer == null ? player : offlinePlayer);
+        }
     }
 
     private void buildNewItemStackAPI(ItemStack itemStack, ItemMeta itemMeta, Player player, Placeholders placeholders) {
@@ -559,6 +381,9 @@ public class MenuItemStack extends ZUtils {
             itemMeta.setRarity(this.itemRarity.getItemRarity());
         }
 
+    }
+
+    private void buildTrimAPI(ItemStack itemStack, ItemMeta itemMeta, Player player, Placeholders placeholders) {
         if (itemMeta instanceof ArmorMeta && this.trimConfiguration != null) {
             ((ArmorMeta) itemMeta).setTrim(new ArmorTrim(this.trimConfiguration.getMaterial(), this.trimConfiguration.getPattern()));
         }
@@ -1156,5 +981,21 @@ public class MenuItemStack extends ZUtils {
 
     public void setTrimConfiguration(TrimConfiguration trimConfiguration) {
         this.trimConfiguration = trimConfiguration;
+    }
+
+    public boolean isCenterLore() {
+        return centerLore;
+    }
+
+    public void setCenterLore(boolean centerLore) {
+        this.centerLore = centerLore;
+    }
+
+    public boolean isCenterName() {
+        return centerName;
+    }
+
+    public void setCenterName(boolean centerName) {
+        this.centerName = centerName;
     }
 }

@@ -28,12 +28,14 @@ import fr.maxlego08.menu.loader.materials.Base64Loader;
 import fr.maxlego08.menu.loader.materials.EcoLoader;
 import fr.maxlego08.menu.loader.materials.HeadDatabaseLoader;
 import fr.maxlego08.menu.loader.materials.ItemsAdderLoader;
+import fr.maxlego08.menu.loader.materials.MagicCosmeticsLoader;
 import fr.maxlego08.menu.loader.materials.NexoLoader;
 import fr.maxlego08.menu.loader.materials.NovaLoader;
 import fr.maxlego08.menu.loader.materials.OraxenLoader;
 import fr.maxlego08.menu.loader.materials.SlimeFunLoader;
 import fr.maxlego08.menu.loader.materials.ZHeadLoader;
 import fr.maxlego08.menu.loader.materials.ZItemsLoader;
+import fr.maxlego08.menu.packet.PacketUtils;
 import fr.maxlego08.menu.pattern.ZPatternManager;
 import fr.maxlego08.menu.placeholder.LocalPlaceholder;
 import fr.maxlego08.menu.players.ZDataManager;
@@ -89,11 +91,12 @@ public class MenuPlugin extends ZPlugin {
     private final InventoriesPlayer inventoriesPlayer = new ZInventoriesPlayer(this);
     private final PatternManager patternManager = new ZPatternManager(this);
     private final Enchantments enchantments = new ZEnchantments();
+    // private final PacketUtils packetUtils = new PacketUtils(this);
+    private final Map<String, Object> globalPlaceholders = new HashMap<>();
     private CommandMenu commandMenu;
     private ZScheduler scheduler;
     private DupeManager dupeManager;
     private FontImage fontImage = new EmptyFont();
-    private Map<String, Object> globalPlaceholders = new HashMap<>();
 
     public static boolean isFolia() {
         try {
@@ -109,9 +112,15 @@ public class MenuPlugin extends ZPlugin {
     }
 
     @Override
+    public void onLoad() {
+        // this.packetUtils.onLoad();
+    }
+
+    @Override
     public void onEnable() {
 
         instance = this;
+        // this.packetUtils.onEnable();
 
         this.scheduler = isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this);
 
@@ -177,7 +186,6 @@ public class MenuPlugin extends ZPlugin {
         this.addSimpleListener(this.inventoryManager);
 
         /* Add Saver */
-        this.addSave(this.messageLoader);
         this.addSave(this.inventoryManager);
         this.addSave(this.commandManager);
         this.addSave(this.dataManager);
@@ -195,7 +203,10 @@ public class MenuPlugin extends ZPlugin {
         if (this.isActive(Plugins.NEXO)) {
             this.inventoryManager.registerMaterialLoader(new NexoLoader());
         }
-        if (this.isActive(Plugins.ITEMSADDER)) {
+        if (this.isEnable(Plugins.MAGICCOSMETICS)) {
+            this.inventoryManager.registerMaterialLoader(new MagicCosmeticsLoader());
+        }
+        if (this.isEnable(Plugins.ITEMSADDER)) {
             this.inventoryManager.registerMaterialLoader(new ItemsAdderLoader(this));
             this.fontImage = new ItemsAdderFont();
         }
@@ -214,6 +225,7 @@ public class MenuPlugin extends ZPlugin {
         }
 
         this.getSavers().forEach(saver -> saver.load(this.getPersist()));
+        this.messageLoader.load();
 
         LocalPlaceholder localPlaceholder = LocalPlaceholder.getInstance();
         localPlaceholder.register("argument_", (offlinePlayer, value) -> {
@@ -273,6 +285,8 @@ public class MenuPlugin extends ZPlugin {
         this.websiteManager.loadPlaceholders();
         this.dataManager.loadDefaultValues();
 
+        // this.inventoryManager.registerInventoryListener(this.packetUtils);
+
         this.postEnable();
     }
 
@@ -288,6 +302,7 @@ public class MenuPlugin extends ZPlugin {
         if (Token.token != null) {
             Token.getInstance().save(this.getPersist());
         }
+        // this.packetUtils.onDisable();
 
         this.postDisable();
     }

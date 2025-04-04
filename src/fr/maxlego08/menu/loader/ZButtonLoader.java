@@ -133,7 +133,12 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
 
         List<String> slotsAsString = configuration.getStringList(path + "slots");
         List<Integer> slots = ButtonLoader.loadSlot(slotsAsString);
-        if (slots.isEmpty()) slots = defaultButtonValue.getSlots();
+        if (slots.isEmpty()) {
+            slots = defaultButtonValue.getSlots();
+        } else {
+            int finalPage = page;
+            slots = slots.stream().map(specialSlot -> specialSlot + ((finalPage - 1) * this.inventorySize)).collect(Collectors.toList());
+        }
 
         char currentChar = buttonName.charAt(0);
         if (this.matrix.containsKey(currentChar)) {
@@ -149,6 +154,8 @@ public class ZButtonLoader extends ZUtils implements Loader<Button> {
         } else {
             button.setSlots(slots);
         }
+        button.setPage(page);
+
         button.setPermanent(configuration.getBoolean(path + "isPermanent", configuration.getBoolean(path + "is-permanent", defaultButtonValue.isPermanent())));
         button.setUpdateOnClick(configuration.getBoolean(path + "updateOnClick", configuration.getBoolean(path + "update-on-click", defaultButtonValue.isUpdateOnClick())));
         button.setCloseInventory(configuration.getBoolean(path + "closeInventory", configuration.getBoolean(path + "close-inventory", defaultButtonValue.isCloseInventory())));
