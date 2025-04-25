@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.maxlego08</groupId>
   <artifactId>zmenu</artifactId>
-  <version>1.0.3.8</version>
+  <version>1.0.4.0</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -73,11 +73,6 @@
               <artifactSet>
                 <excludes>
                   <exclude>me.arcaniax:HeadDatabase-API</exclude>
-                  <exclude>com.github.victools:*</exclude>
-                  <exclude>com.fasterxml.*:*</exclude>
-                  <exclude>com.fasterxml:*</exclude>
-                  <exclude>org.slf4j:*</exclude>
-                  <exclude>io.swagger.core.v3:*</exclude>
                 </excludes>
               </artifactSet>
               <relocations>
@@ -274,48 +269,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.victools</groupId>
-      <artifactId>jsonschema-generator</artifactId>
-      <version>4.37.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.18.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>classmate</artifactId>
-      <version>1.6.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.9</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>2.0.9</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.victools</groupId>
-      <artifactId>jsonschema-module-swagger-2</artifactId>
-      <version>4.37.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>2.2.28</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>com.github.Zrips</groupId>
       <artifactId>Jobs</artifactId>
       <version>5.2.2.3</version>
@@ -329,18 +282,21 @@
       <scope>system</scope>
       <systemPath>${basedir}/libs/zItems-1.0.0.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>nexo</groupId>
+      <artifactId>nexo</artifactId>
+      <version>0.5.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/nexo-0.5.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.hibiscusmc</groupId>
+      <artifactId>HMCCosmetics</artifactId>
+      <version>2.7.7</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/HMCCosmetics-2.7.7.jar</systemPath>
+    </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>2.18.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <properties>
     <xseries.version>13.0.0</xseries.version>
     <maven.compiler.source>8</maven.compiler.source>

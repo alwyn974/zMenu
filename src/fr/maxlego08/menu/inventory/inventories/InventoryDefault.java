@@ -38,8 +38,8 @@ public class InventoryDefault extends VInventory {
 
     private final Map<Integer, TimerTask> timers = new HashMap<>();
     private Inventory inventory;
-    private List<Inventory> oldInventories;
-    private List<Button> buttons;
+    private List<Inventory> oldInventories = new ArrayList<>();
+    private List<Button> buttons = new ArrayList<>();
     private int maxPage = 1;
     private boolean isAsync = false;
 
@@ -288,7 +288,7 @@ public class InventoryDefault extends VInventory {
      * @return the oldInventories
      */
     public List<Inventory> getOldInventories() {
-        return oldInventories;
+        return this.oldInventories == null ? new ArrayList<>() : this.oldInventories;
     }
 
     /**
@@ -312,7 +312,7 @@ public class InventoryDefault extends VInventory {
         String displayName = button.buildDisplayName(this.player);
 
         if (!lore.isEmpty() && refreshRequirement.isRefreshLore()) {
-            Meta.meta.updateLore(itemMeta, papi(lore, player, false), this.player);
+            Meta.meta.updateLore(itemMeta, papi(lore, player, false), button.getItemStack().getLoreType());
         }
 
         if (displayName != null && refreshRequirement.isRefreshName()) {
@@ -340,7 +340,7 @@ public class InventoryDefault extends VInventory {
         List<String> lore = button.buildLore(this.player);
         String displayName = button.buildDisplayName(this.player);
 
-        if (!lore.isEmpty()) Meta.meta.updateLore(itemMeta, papi(lore, this.player, false), this.player);
+        if (!lore.isEmpty()) Meta.meta.updateLore(itemMeta, papi(lore, this.player, false), button.getItemStack().getLoreType());
         if (displayName != null) Meta.meta.updateDisplayName(itemMeta, papi(displayName, this.player, false), this.player);
 
         itemStack.setItemMeta(itemMeta);
