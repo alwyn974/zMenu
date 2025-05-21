@@ -10,7 +10,7 @@ import java.util.Map;
 public class InventorySchema {
     @Schema(description = "The name of the inventory", names = {"title"})
     public String name;
-    @Schema(description = "The size of the inventory. Can only be set if the type is CHEST. Size will be overriden if you use matrix !", required = true, allowedValues = {"9", "18", "27", "36", "45", "54"})
+    @Schema(description = "The size of the inventory. Can only be set if the type is CHEST. Size will be overridden if you use matrix !", required = true, allowedValues = {"9", "18", "27", "36", "45", "54"})
     public int size;
     @Schema(description = "The type of the inventory.", excludeValues = {"PLAYER", "CRAFTING"})
     public InventoryType type = InventoryType.CHEST;

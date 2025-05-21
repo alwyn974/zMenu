@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.*;
 import re.alwyn974.schema.generator.SchemaModule;
+import re.alwyn974.schema.schemas.command.CommandsSchema;
 import re.alwyn974.schema.schemas.inventory.InventorySchema;
 
 import java.io.IOException;
@@ -25,5 +26,8 @@ public class SchemaMaker {
         JsonNode jsonSchema = generator.generateSchema(InventorySchema.class);
 
         Files.write(Paths.get("inventory.json"), jsonSchema.toPrettyString().getBytes(StandardCharsets.UTF_8));
+
+//        jsonSchema = generator.generateSchema(CommandsSchema.class);
+//        Files.write(Paths.get("commands.json"), jsonSchema.toPrettyString().getBytes(StandardCharsets.UTF_8));
     }
 }
